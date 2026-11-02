@@ -1,0 +1,178 @@
+Game Design Document (GDD)
+[Nombre provisional: "Voxel Rumble"]
+Versión: 1.0 Tipo de proyecto: MVP académico Género: Party game / minijuegos competitivos Modo de juego: Multijugador local (2-4 jugadores, pantalla compartida) Plataformas objetivo: PC, Xbox Motor: Unity
+
+1. Visión general
+1.1 Concepto
+Juego multijugador local de minijuegos, inspirado en Fall Guys pero de menor escala, pensado como experiencia rápida, sencilla y divertida en pantalla compartida. Hasta 4 jugadores compiten en una secuencia de 3 minijuegos con estilo visual voxel y cámara isométrica fija, acumulando puntos para determinar un ganador final.
+1.2 Pilares de diseño
+Simplicidad inmediata: cualquier jugador debe poder entender los controles y objetivos en segundos, sin tutoriales extensos.
+Sesiones cortas y repetibles: partidas de ~5 minutos ideales para varias rondas seguidas.
+Competencia amistosa local: pensado para jugarse en el mismo sofá, con caos controlado y momentos memorables.
+Consistencia mecánica: todos los minijuegos comparten una base de movimiento, físicas y colisiones para reducir la curva de aprendizaje entre uno y otro.
+1.3 Público objetivo
+Jugadores casuales, grupos de amigos o familia que buscan una experiencia local rápida, sin necesidad de experiencia previa en videojuegos.
+
+2. Estructura de una sesión de juego
+Lobby / Selección de jugadores: los jugadores se unen conectando mando o usando el teclado compartido. Se asigna automáticamente el color de jugador (rojo, azul, amarillo, verde) según orden de conexión.
+Selección aleatoria de minijuegos: el sistema elige un orden aleatorio entre los 3 minijuegos disponibles para esa sesión.
+Ronda 1, 2 y 3: se juega cada minijuego de forma secuencial, con una pantalla de resultados/puntuación intermedia entre cada uno.
+Pantalla de resultados final: se suman los puntos obtenidos en las tres rondas y se declara al ganador de la sesión.
+Vuelta al lobby: los jugadores pueden iniciar una nueva sesión.
+Duración estimada total: ~5 minutos (incluyendo transiciones y pantallas de resultado).
+
+3. Sistema de puntuación
+3.1 Principio general
+Cada minijuego otorga puntos según posición final obtenida por el jugador.
+En minijuegos con eliminación temporal (como Piso es lava), el tiempo de supervivencia también influye en el desempate dentro del mismo puesto.
+Los jugadores eliminados durante un minijuego no son eliminados de la sesión: participan normalmente en el siguiente minijuego.
+3.2 Tabla de puntos por posición (propuesta base, 4 jugadores)
+Posición
+Puntos
+1°
+100
+2°
+70
+3°
+40
+4°
+20
+
+Nota de diseño: esta tabla es un valor inicial de referencia y deberá ajustarse durante el playtesting según el balance deseado entre "castigar" el último lugar y mantener la partida emocionante hasta el final. Con 2 o 3 jugadores se utilizan los puestos correspondientes de la misma tabla (ej. con 2 jugadores solo se reparten 100 y 70).
+3.3 Empates
+En caso de empate de puntos totales al final de la sesión, se puede definir un desempate por tiempo acumulado de actividad (sumatoria de tiempos de supervivencia en los minijuegos con eliminación) o, alternativamente, declarar victoria compartida. Se recomienda la primera opción para mantener siempre un ganador único.
+
+4. Minijuegos (MVP)
+Los tres minijuegos comparten una base mecánica común:
+Movimiento en el plano del escenario (adelante/atrás/izquierda/derecha).
+Salto.
+Física de gravedad y colisiones con el escenario.
+Posibilidad de empujar/golpear a otros jugadores cuando el diseño del minijuego lo permita, generando momentos de caos típico del género.
+4.1 Captura la Bandera
+Categoría: Objetivo/estrategia con acción directa Ambientación: Cuarto o sala de juegos (escala aumentada, como si los jugadores fueran de tamaño reducido dentro de una habitación cotidiana).
+Objetivo: Capturar y transportar una bandera hasta una zona designada, sumando puntos por cada captura o por tiempo en posesión.
+Mecánicas clave:
+Cada jugador puede tomar la bandera si está libre o si logra quitársela a otro jugador (mediante el empujón/golpe genérico).
+El jugador con la bandera puede ser más lento o quedar en desventaja (a definir en balance) para incentivar la disputa.
+Puntuación basada en tiempo de posesión y/o número de capturas exitosas dentro del tiempo límite de la ronda.
+Duración estimada: 60-90 segundos.
+Condición de fin: tiempo límite alcanzado. Se determina el ranking según el desempeño (puntos internos del minijuego), no eliminación.
+4.2 Piso es Lava
+Categoría: Supervivencia/reacción rápida Ambientación: Entorno volcánico.
+Objetivo: Evitar caer o pisar zonas peligrosas (lava) que se van reduciendo o activando progresivamente sobre una plataforma.
+Mecánicas clave:
+El área segura se reduce con el tiempo o aparecen nuevas zonas de peligro de forma progresiva.
+Los jugadores que caen o son alcanzados por la lava quedan eliminados de esa ronda (pero no de la sesión).
+Los empujones entre jugadores son especialmente relevantes aquí, ya que pueden forzar a un rival a caer.
+Duración estimada: 45-75 segundos (variable según cuántos jugadores sobrevivan).
+Condición de fin: queda un jugador en pie, o se acaba el tiempo límite con jugadores restantes.
+Puntuación: posición final (según orden de eliminación, siendo el último en caer o el sobreviviente el mejor puesto) + tiempo de supervivencia como desempate.
+4.3 Circuito de Obstáculos
+Categoría: Carrera/habilidad Ambientación: Circuito temático con obstáculos y barriles.
+Objetivo: Llegar a la meta esquivando obstáculos móviles y fijos (barriles rodantes, plataformas, etc.) en el menor tiempo posible.
+Mecánicas clave:
+Recorrido lineal con obstáculos que requieren salto o esquive lateral.
+Los barriles pueden derribar a los jugadores, haciéndoles perder tiempo (sin eliminación).
+Posibilidad de usar el empujón genérico para interferir con rivales cercanos.
+Duración estimada: 60-90 segundos.
+Condición de fin: todos los jugadores cruzan la meta o se alcanza el tiempo límite.
+Puntuación: según orden de llegada a la meta.
+
+5. Controles
+5.1 Mando (control principal recomendado)
+Soporte para hasta 4 mandos simultáneos (Xbox / genéricos compatibles con el sistema de Input de Unity).
+Esquema genérico:
+Stick izquierdo: movimiento.
+Botón A / Cruz: saltar.
+Botón B / Círculo (o equivalente): empujar/interactuar.
+Start/Menu: pausa.
+5.2 Teclado (soporte secundario, un teclado por partida)
+Debido a que solo se admite un teclado por sesión, se definen esquemas fijos para hasta 2 jugadores simultáneos en el mismo teclado (los jugadores adicionales requieren mando):
+Jugador
+Movimiento
+Salto
+Empujar/Interactuar
+Jugador A
+W A S D
+Espacio
+Shift izquierdo
+Jugador B
+Flechas direccionales
+Enter / Intro
+Ctrl derecho
+
+Nota de diseño: si en el futuro se desea soportar más de 2 jugadores por teclado, se requeriría rediseñar el esquema o limitarlo explícitamente; para el MVP se define un máximo de 2 jugadores por teclado.
+5.3 Mouse
+Sin función durante la jugabilidad (cámara fija, no se requiere apuntado). Uso exclusivo para navegación de menús (lobby, pantallas de resultados, configuración).
+
+6. Cámara y presentación visual
+Perspectiva: isométrica fija, sin control del jugador sobre la cámara.
+Dimensión: 3D con estética voxel.
+Encuadre: cada minijuego define su propio encuadre de cámara fijo (o con paneo/zoom automático limitado) para asegurar que todos los jugadores sean visibles en pantalla en todo momento, evitando la necesidad de split-screen.
+Legibilidad: dado el estilo voxel y la cámara fija, se debe asegurar contraste visual claro entre jugadores, obstáculos y escenario (ver sección de arte).
+
+7. Arte y estilo visual
+Estilo general: voxel, geometría simple, adecuada al alcance de un MVP académico (bajo costo de producción de assets).
+Ambientación por minijuego (sin tema visual unificado global):
+Captura la bandera: interior tipo sala/cuarto de juegos, con objetos cotidianos a escala aumentada.
+Piso es lava: entorno volcánico, con paleta de colores cálidos (rojos, naranjas, negros).
+Circuito de obstáculos: ambientación de circuito/pista, con elementos industriales o de carrera (barriles, rampas).
+Identificación de jugadores: color fijo y predecible en todo momento:
+Jugador 1: rojo
+Jugador 2: azul
+Jugador 3: amarillo
+Jugador 4: verde
+Sin sistema de cosméticos ni personalización de personajes en esta versión.
+UI: minimalista y funcional, priorizando claridad de puntuación y estado de la partida sobre la estética elaborada, dado el alcance del proyecto.
+
+8. Audio
+Efectos de sonido (SFX): básicos, cubriendo acciones clave (salto, empujón, eliminación, victoria, cuenta regresiva, transición de pantalla).
+Música:
+Objetivo inicial: composición original por minijuego para reforzar identidad temática.
+Alternativa de contingencia: música libre de derechos si el desarrollo de música original excede el tiempo disponible del proyecto académico.
+Ambientación sonora por minijuego: acorde a la temática visual (ej. sonidos de lava/volcán, ambiente de sala de juegos, motor/carrera para el circuito).
+
+9. Tecnología
+Motor: Unity (versión LTS recomendada al inicio del desarrollo).
+Sistema de input: se recomienda el uso del Input System de Unity para gestionar múltiples dispositivos (mandos + teclado) de forma simultánea y desacoplada.
+Plataformas: PC (Windows) y Xbox.
+Modo de red: ninguno; multijugador exclusivamente local, sin infraestructura online.
+
+10. Alcance del MVP y exclusiones
+Incluido en el MVP
+3 minijuegos jugables completos (Captura la bandera, Piso es lava, Circuito de obstáculos).
+Soporte para 2 a 4 jugadores locales (mando + 1 teclado compartido para hasta 2 jugadores).
+Sistema de puntuación acumulada y pantalla de resultados.
+Identificación de jugadores por color fijo.
+Cámara isométrica fija por minijuego.
+Arte voxel básico con ambientación temática por minijuego.
+Audio con SFX básicos y música (original u libre de derechos según tiempo disponible).
+Explícitamente fuera de alcance
+Progresión entre sesiones (desbloqueables, niveles de cuenta, etc.).
+Sistema de cosméticos o personalización visual de personajes.
+Multijugador en línea o funcionalidades de red.
+Más de 3 minijuegos (posible expansión futura, no en el MVP).
+Soporte para más de un teclado o más de 2 jugadores por teclado.
+Control de cámara por parte del jugador.
+
+11. Riesgos y consideraciones de diseño
+Balance de puntuación: la tabla de puntos por posición (sección 3.2) es un punto crítico a validar con playtesting; un mal balance puede hacer que la partida se decida antes del último minijuego.
+Música original vs. tiempo de desarrollo: al ser un proyecto académico con tiempo limitado, se recomienda definir un punto de decisión temprano (checkpoint) para migrar a música libre de derechos si la producción original atrasa el cronograma.
+Consistencia de físicas entre minijuegos: al compartir mecánicas base (movimiento, salto, empujón), es importante que el "feel" de estas acciones sea idéntico en los tres minijuegos para no confundir a los jugadores al cambiar de uno a otro.
+Legibilidad con 4 jugadores en pantalla: la cámara fija isométrica debe probarse específicamente con 4 jugadores simultáneos para asegurar que ningún jugador quede fuera de cuadro o resulte difícil de distinguir.
+
+12. Próximos pasos sugeridos
+Prototipar la mecánica base compartida (movimiento, salto, empujón) en un escenario de pruebas antes de construir los tres minijuegos completos.
+Validar la tabla de puntuación con playtesting interno.
+Definir el encuadre de cámara específico para cada minijuego.
+Establecer el checkpoint de decisión sobre música original vs. libre de derechos.
+
+
+
+2. Arquitectura de Escenas y UI2.1 Estructura Técnica de Escenas (Unity)Para garantizar una gestión modular, limpia y eficiente del estado del juego:Escena UI / Global (Scene_UI): Escena persistente (o principal de UI) que contiene toda la interfaz de usuario canvas (Menú Principal, Conexión de Jugadores, Ajustes, HUD de Juego y Pantallas de Resultados). La UI vive de forma centralizada y superpuesta.Escenas de Minijuegos (Scene_Minigame_01, Scene_Minigame_02, Scene_Minigame_03): Cada minijuego se carga dinámicamente como una escena independiente que contiene únicamente el escenario 3D, cámaras, luces y la lógica específica del nivel (Captura la Bandera, Piso es Lava, Circuito de Obstáculos).3. Flujo y Navegación de Pantallas (UI Flow)La navegación dentro de la UI centralizada funciona mediante la activación e inactivación de paneles.[ Panel_Menu ] ──(Play)──> [ Panel_ConnectPlayers ] ──(GO - Todos listos)──> [ Carga de Minijuego + Panel_Game ]
+      │                                │
+  (Settings)                         (Back)
+      │                                │
+      ▼                                ▼
+[ Panel_Settings ]             [ Regresa a Panel_Menu ]
+3.1 Especificación Detallada de Paneles1. Panel_Menu (Menú Principal)Es la pantalla de inicio del juego al arrancar la aplicación.Componentes visuales:Título del juego (Voxel Rumble).play_button: Botón para iniciar el flujo de partida.settings_button: Botón para abrir configuración.exit_button: Botón para cerrar la aplicación.Comportamiento / Eventos:press (play_button) $\rightarrow$ Activa Panel_ConnectPlayers e inactiva Panel_Menu.press (settings_button) $\rightarrow$ Activa Panel_Settings e inactiva Panel_Menu.press (exit_button) $\rightarrow$ Cierra la aplicación (Application.Quit()).2. Panel_ConnectPlayers (Lobby y Selección de Personaje)Pantalla donde los jugadores locales se conectan, confirman su presencia y seleccionan su personaje o color asignado.Componentes visuales:4 ranuras de jugador (Slots P1, P2, P3, P4) mostrando el estado (Conectado / Presione botón para unirse) y la visualización/color del personaje seleccionado.Indicador de estado "Listo / Ready" por cada jugador conectado.button_go: Botón de inicio de partida.button_back: Botón para cancelar y regresar.Comportamiento / Eventos:Conexión: Al presionar un botón del mando o tecla asignada, el jugador se une a la ranura libre.press (button_back) $\rightarrow$ Desconecta a los jugadores y regresa a Panel_Menu.press (button_go) $\rightarrow$ Requiere confirmación de todos los jugadores conectados. Una vez que todos están en estado "Listo", carga la escena del primer minijuego seleccionado aleatoriamente y activa Panel_Game.3. Panel_Settings (Configuración)Estado actual: (Vacío temporalmente para el MVP).Propósito futuro: Ajustes generales de sonido (volumen de música y efectos), resolución y guía de controles.Comportamiento / Eventos:Botón de retorno para guardar/cancelar y volver a Panel_Menu.4. Panel_Game (HUD / UI de Jugabilidad en Vivo)Panel de la interfaz de usuario que se superpone mientras transcurre la partida dentro de la escena activa del minijuego.Componentes visuales y funciones de renderizado (show):show(score_player[i]): Muestra en tiempo real la puntuación o desempeño del jugador $i$ ($i \in \{1, 2, 3, 4\}$).show(time_text): Muestra el tiempo restante en cuenta regresiva para la finalización de la ronda actual.show(posicion_player): Muestra la posición o ranking en vivo del jugador según el puntaje o estado actual de la ronda (1°, 2°, 3°, 4°).Transiciones de estado del juego:Al finalizar el tiempo o cumplirse la condición de fin de minijuego, Panel_Game muestra brevemente la tabla de posiciones de la ronda/sesión antes de pasar a la siguiente escena de minijuego o de regresar al lobby principal.
